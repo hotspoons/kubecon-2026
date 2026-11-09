@@ -284,7 +284,7 @@ export const INTERESTS = [
   {
     id: 'business',
     label: 'Business & adoption',
-    blurb: 'end-user stories, case studies, adoption, ROI and TCO, licensing, governance, policy, go-to-market',
+    blurb: 'end-user stories, case studies, adoption, ROI and TCO, IP, patents and licensing, governance, policy, go-to-market',
     rules: [
       'case stud(?:y|ies)', 'end[- ]users?', 'user stor(?:y|ies)', 'success stor(?:y|ies)', 'adoption', 'adopt\\w*',
       'customers?', 'enterprises?', 'business\\w*', 'roi', 'return on investment', 'total cost of ownership', 'tco',
@@ -292,6 +292,11 @@ export const INTERESTS = [
       'revenue', 'startups?', 'market\\w*', 'regulat\\w*', 'compliance', 'public policy',
       'governance', 'ospos?', 'open source program', 'leadership', 'executives?', 'stakeholders?', 'buy (?:vs\\.?|versus|or) build',
       'migration stor\\w*', 'sovereignty', 'digital sovereignty',
+      // IP, patents and licensing are Ryan's background ('ip' alone would be IP addresses)
+      'intellectual property', 'patents?', 'patent\\w*', 'trademarks?', 'copyrights?', 'copyleft', 'relicens\\w*',
+      'source[- ]available', 'open source licen[cs]\\w*', 'licen[cs]e compliance', 'dual[- ]licen[cs]\\w*', 'spdx',
+      'contributor licen[cs]e agreements?', { re: 'CLAs?', cs: true }, 'export controls?', 'legal', 'lawyers?',
+      { re: 'A?GPL(?:v?\\d)?', cs: true }, 'apache[- ]2(?:\\.0)?', 'mit licen[cs]e', 'bsl', 'elastic licen[cs]e',
     ],
   },
   {
@@ -312,7 +317,7 @@ export const TEAM = [
   { id: 'liam', name: 'Liam', about: 'operators, DRA, disaggregated P/D, scheduling', interests: ['operators', 'dra', 'disagg', 'scheduling'] },
   { id: 'rich', name: 'Rich', about: 'agents and agentic stuff', interests: ['agents'] },
   { id: 'ed', name: 'Ed', about: 'inference, HPC, GPUs and accelerators', interests: ['inference', 'hpc', 'gpu'] },
-  { id: 'ryan', name: 'Ryan', about: 'the business side: adoption, customers, licensing, cost', interests: ['business', 'cost'] },
+  { id: 'ryan', name: 'Ryan', about: 'the business side: adoption, customers, IP, patents and licensing, cost', interests: ['business', 'cost'] },
 ]
 
 /** Where a hit lands, and what it is worth. */
