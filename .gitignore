@@ -1,0 +1,44 @@
+# Node
+node_modules/
+dist/
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor/OS
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Claude Code local state (worktrees, session scratch)
+.claude/
+
+# ext/ holds other repositories checked out beside this one (piedmont, the reference Cloudflare
+# project); only its README is ours
+ext/*
+!ext/README.md
+
+# the raw Sessionize feeds the fetch caches (rebuildable; the normalized snapshot in
+# public/data/schedule.json IS committed, so the app builds offline)
+.cache/
+
+# screenshots (scripts/shot.mjs)
+shots/
+
+# the dev container's opencode, OpenChamber, wrangler and gh state (binary, config with
+# credentials, sessions), bind-mounted into ~ by .devcontainer/devcontainer.json so a rebuild
+# keeps them. Never committed.
+/.devhome/
+/.devhome
+
+# credentials: never committed
+.env
+.dev.vars
+.wrangler/
+
+# tsc -b incremental state
+tsconfig.tsbuildinfo

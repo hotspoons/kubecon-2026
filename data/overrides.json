@@ -1,0 +1,4 @@
+{
+  "_readme": "Hand corrections to the automatic interest tagging, per Sessionize session id (the number in the official schedule's ?id= link). `add` forces interests on, `remove` forces them off; both are interest ids from scripts/interests.mjs. Applied by scripts/fetch-schedule.mjs after the keyword rules; `just tag` re-applies without a network fetch. Keep a `_note` beside each entry saying why.",
+  "1304040": { "_note": "Registration + Badge Pick-Up: not about anything", "remove": ["testing", "security"] }
+}

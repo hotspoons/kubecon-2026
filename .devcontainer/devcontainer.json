@@ -1,0 +1,78 @@
+{
+	"name": "kubecon-2026",
+	// The KubeCon NA 2026 schedule app: one Vite + TypeScript app deployed as a Cloudflare Worker
+	// with static assets. Based on piedmont's container (same image, bind mounts, cross-platform
+	// initializeCommand, opencode.sh) with everything that app does not need stripped out: no
+	// Docker-in-Docker, no kubectl/Helm, no GDAL, no Blender. What is here: Node 24 (the active
+	// LTS; the image is Debian trixie), `just`, wrangler (an npm devDependency, so `npx wrangler`),
+	// headless Chromium for screenshots (scripts/shot.mjs) and cloudflared for quick tunnels.
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:24",
+	"features": {
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+	// opencode first, and on its own: onCreateCommand finishes before the editor connects, so the
+	// binary is there when OpenChamber activates. post-create.sh runs after the editor is up.
+	"onCreateCommand": "bash .devcontainer/opencode.sh",
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	//   5173  the app's dev server (`just dev`)
+	//   4173  the production build, served (`just preview`)
+	//   8787  the Worker, run locally by wrangler against the production build (`just worker`)
+	"forwardPorts": [5173, 4173, 8787],
+	"portsAttributes": {
+		"5173": { "label": "app (vite)" },
+		"4173": { "label": "app (preview)" },
+		"8787": { "label": "worker (wrangler dev)" }
+	},
+	// Published at container create as well, for a container started by the devcontainer CLI with
+	// no editor attached to forward ports (an agent driving it from the host):
+	//   npx @devcontainers/cli up --workspace-folder . && npx @devcontainers/cli exec --workspace-folder . just dev
+	"appPort": ["5173:5173", "4173:4173", "8787:8787"],
+	// Runs on the HOST before the container exists, on any host OS: cmd.exe/PowerShell on Windows,
+	// or the `sh` fallback everywhere else. It makes every bind-mount source, so Docker never
+	// creates them root-owned (or fails on a missing file): ~/.claude, ~/.claude.json, and
+	// opencode's, OpenChamber's and wrangler's directories under .devhome/ in this checkout.
+	"initializeCommand": "cmd.exe /c powershell -NoProfile -Command \"$ErrorActionPreference='SilentlyContinue'; New-Item -ItemType Directory -Force -Path $env:USERPROFILE\\.claude, .devhome\\.opencode, .devhome\\.config\\opencode, .devhome\\.local\\share\\opencode, .devhome\\.local\\state\\opencode, .devhome\\.cache\\opencode, .devhome\\.config\\openchamber, .devhome\\.agents, .devhome\\.config\\.wrangler, .devhome\\.config\\gh | Out-Null; if (!(Test-Path $env:USERPROFILE\\.claude.json)) { Set-Content -Path $env:USERPROFILE\\.claude.json -Value '{}' }\" || sh -c 'mkdir -p \"$HOME/.claude\" .devhome/.opencode .devhome/.config/opencode .devhome/.local/share/opencode .devhome/.local/state/opencode .devhome/.cache/opencode .devhome/.config/openchamber .devhome/.agents .devhome/.config/.wrangler .devhome/.config/gh && touch \"$HOME/.claude.json\"'",
+	"containerEnv": {
+		// Vite and wrangler bind to every interface so a published port reaches them from the host
+		"HOST": "0.0.0.0",
+		// wrangler: never open a browser, never ask about telemetry on a terminal nobody sees
+		"WRANGLER_SEND_METRICS": "false",
+		"CI": "1"
+	},
+	"mounts": [
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.claude.json,target=/home/node/.claude.json,type=bind",
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.claude,target=/home/node/.claude,type=bind",
+		// opencode and OpenChamber: binary, config, auth, sessions, state, caches and skills, from
+		// .devhome/ in this checkout (gitignored), so a rebuild keeps all of it. Each .devhome/<path>
+		// is ~/<path>. Why mounts and not symlinks, and the install: .devcontainer/opencode.sh (keep
+		// its list in step with these and initializeCommand).
+		"source=${localWorkspaceFolder}/.devhome/.opencode,target=/home/node/.opencode,type=bind",
+		"source=${localWorkspaceFolder}/.devhome/.config/opencode,target=/home/node/.config/opencode,type=bind",
+		"source=${localWorkspaceFolder}/.devhome/.local/share/opencode,target=/home/node/.local/share/opencode,type=bind",
+		"source=${localWorkspaceFolder}/.devhome/.local/state/opencode,target=/home/node/.local/state/opencode,type=bind",
+		"source=${localWorkspaceFolder}/.devhome/.cache/opencode,target=/home/node/.cache/opencode,type=bind",
+		"source=${localWorkspaceFolder}/.devhome/.config/openchamber,target=/home/node/.config/openchamber,type=bind",
+		"source=${localWorkspaceFolder}/.devhome/.agents,target=/home/node/.agents,type=bind",
+		// wrangler's login (`npx wrangler login`) and gh's (`gh auth login`), kept across rebuilds the
+		// same way. Deploys from CI use secrets instead (.github/workflows/deploy.yml).
+		"source=${localWorkspaceFolder}/.devhome/.config/.wrangler,target=/home/node/.config/.wrangler,type=bind",
+		"source=${localWorkspaceFolder}/.devhome/.config/gh,target=/home/node/.config/gh,type=bind"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"oxc.oxc-vscode",
+				"esbenp.prettier-vscode",
+				"anthropic.claude-code",
+				// OpenChamber: a UI for opencode inside the editor (opencode itself: opencode.sh)
+				"FedaykinDev.openchamber"
+			],
+			"settings": {
+				"editor.formatOnSave": false,
+				"typescript.tsdk": "node_modules/typescript/lib",
+				"files.watcherExclude": { "**/.devhome/**": true, "**/node_modules/**": true }
+			}
+		}
+	}
+}

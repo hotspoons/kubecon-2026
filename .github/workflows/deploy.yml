@@ -1,0 +1,49 @@
+# Build and deploy the schedule app to Cloudflare Workers (kubecon.siomporas.com).
+#
+# Runs on every push to main, by hand from the Actions tab, and on a timer during the event so the
+# schedule snapshot (public/data/schedule.json, fetched from Sessionize at build time) stays fresh
+# without anyone pushing. The fetch falls back to the committed snapshot if Sessionize is down.
+#
+# Secrets the repository needs (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   a token with Workers Scripts: Edit, Account Settings: Read, and on the
+#                          siomporas.com zone: Zone: Read, DNS: Edit, Workers Routes: Edit
+#                          (the custom domain is created from wrangler.jsonc on the first deploy)
+#   CLOUDFLARE_ACCOUNT_ID  the account id (dashboard → Workers & Pages → right column)
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # every two hours, Nov 8–13 2026 (UTC); the schedule is final-ish but rooms and times move
+    - cron: '0 */2 8-13 11 *'
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Refresh the schedule from Sessionize
+        run: node scripts/fetch-schedule.mjs || echo "::warning::fetch failed; deploying the committed snapshot"
+      - run: npx tsc -b
+      - run: node --test scripts/*.test.mjs
+      - run: npm run build
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
