@@ -17,8 +17,13 @@ const browser = await chromium.launch()
 const context = await browser.newContext({ ...devices['iPhone 14'] })
 const page = await context.newPage()
 const errors = []
+// Cloudflare injects its Web Analytics beacon (/cdn-cgi/rum) into the live site; offline it has
+// nowhere to report to, which is not the app's problem
+let beacons = 0
+const vendor = (u) => /\/cdn-cgi\//.test(u)
 page.on('pageerror', (e) => errors.push(String(e)))
-page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()) })
+page.on('console', (m) => { if (m.type() === 'error' && !vendor(m.location()?.url ?? '')) errors.push(m.text()) })
+page.on('requestfailed', (r) => (vendor(r.url()) ? beacons++ : errors.push(`request failed: ${r.url()} (${r.failure()?.errorText})`)))
 
 await page.goto(url, { waitUntil: 'networkidle' })
 await page.waitForSelector('[data-ready]', { timeout: 20000 })
@@ -44,7 +49,7 @@ await page.goto(url + '#d=2026-11-11&v=list', { waitUntil: 'domcontentloaded' })
 const ready = await page.waitForSelector('[data-ready]', { timeout: 15000 }).then(() => true).catch(() => false)
 if (!ready) errors.push('offline: the app did not render the schedule')
 const cards = await page.locator('.card').count()
-console.log(`offline reload: rendered=${ready}, ${cards} cards on screen`)
+console.log(`offline reload: rendered=${ready}, ${cards} cards on screen${beacons ? `, ${beacons} Cloudflare beacon requests failed (ignored)` : ''}`)
 if (ready && cards === 0) errors.push('offline: rendered but no sessions')
 await page.screenshot({ path: out })
 await browser.close()

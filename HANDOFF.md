@@ -68,9 +68,12 @@ operators, scheduling, training, disagg P/D; allow a custom mapping per event; f
 Everything was built and verified inside the dev container: `just check` clean (tsc, 8 node
 tests, build: 77 KB JS, 28 KB gzipped, plus the 2 MiB data file and a 4 KB service worker).
 Screenshots are in `shots/` (gitignored): the desktop set from 2026-11-08 and the mobile set
-`m0-before.png` … `m8-scrollback-final.png`, `offline.png`. The first commit was made
-2026-11-09 from the container; nothing has been pushed or deployed (the push needs the secrets
-below in place first, since every push to main runs the Deploy workflow).
+`m0-before.png` … `m8-scrollback-final.png`, `offline.png`. **Deployed.** Rich added the two
+Cloudflare secrets on 2026-11-09; the first push to main ran the Deploy workflow (run 42557311507,
+success) and https://kubecon.siomporas.com is live with the custom domain. Verified against
+production: `node scripts/offline-check.mjs --url https://kubecon.siomporas.com/` installs the
+worker, goes offline, reloads and renders the schedule. Cloudflare injects its Web Analytics beacon
+(`/cdn-cgi/rum`) into the live page; it fails offline and the check ignores it.
 
 Done and verified:
 
@@ -97,10 +100,9 @@ Done and verified:
 
 ## What needs Rich
 
-1. **Secrets for the deploy**: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the GitHub
-   repository (README.md, "Deploy"). Until then every Deploy run fails at the last step. The
-   token needs zone DNS + Workers Routes edit on `siomporas.com` for the custom domain to be made
-   automatically; otherwise drop the `routes` entry and use the workers.dev URL.
+1. **A real phone.** Open https://kubecon.siomporas.com on the iPhone, add it to the home screen,
+   and try the hallway case: search, the Interests sheet, star a talk, open it, back gesture,
+   airplane mode and reopen. Everything so far is from the emulator.
 2. **Review the tagging** for the four of you: `just report`, then open a few sessions in the app
    and read the "why". Wrong tags go in `data/overrides.json`; missing keywords in
    `scripts/interests.mjs`. `just tag` re-applies offline.
