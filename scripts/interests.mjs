@@ -313,12 +313,12 @@ export const INTERESTS = [
  * Patapsco.ai is a sovereign AI company, so `sovereign` is in every preset (Rich, 2026-11-09).
  */
 export const TEAM = [
-  { id: 'matt', name: 'Matt', about: 'storage and performance', interests: ['storage', 'performance'] },
-  { id: 'mason', name: 'Mason', about: 'testing things', interests: ['testing'] },
-  { id: 'liam', name: 'Liam', about: 'operators, DRA, disaggregated P/D, scheduling', interests: ['operators', 'dra', 'disagg', 'scheduling'] },
-  { id: 'rich', name: 'Rich', about: 'agents and agentic stuff', interests: ['agents'] },
-  { id: 'ed', name: 'Ed', about: 'inference, HPC, GPUs and accelerators', interests: ['inference', 'hpc', 'gpu'] },
-  { id: 'ryan', name: 'Ryan', about: 'the business side: adoption, customers, IP, patents and licensing, cost', interests: ['business', 'cost'] },
+  { id: 'matt', name: 'Matt', about: 'storage and performance', interests: ['storage', 'performance', 'sovereign'] },
+  { id: 'mason', name: 'Mason', about: 'testing things', interests: ['testing', 'sovereign'] },
+  { id: 'liam', name: 'Liam', about: 'operators, DRA, disaggregated P/D, scheduling', interests: ['operators', 'dra', 'disagg', 'scheduling', 'sovereign'] },
+  { id: 'rich', name: 'Rich', about: 'agents and agentic stuff', interests: ['agents', 'sovereign'] },
+  { id: 'ed', name: 'Ed', about: 'inference, HPC, GPUs and accelerators', interests: ['inference', 'hpc', 'gpu', 'sovereign'] },
+  { id: 'ryan', name: 'Ryan', about: 'the business side: adoption, customers, IP, patents and licensing, cost', interests: ['business', 'cost', 'sovereign'] },
 ]
 
 /** Where a hit lands, and what it is worth. */
