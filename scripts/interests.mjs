@@ -310,6 +310,7 @@ export const INTERESTS = [
 /**
  * The team's presets. Each is a set of interests that selects those sessions in one click; anyone
  * can add or drop interests from there. The `about` line is shown under the name in the picker.
+ * Patapsco.ai is a sovereign AI company, so `sovereign` is in every preset (Rich, 2026-11-09).
  */
 export const TEAM = [
   { id: 'matt', name: 'Matt', about: 'storage and performance', interests: ['storage', 'performance'] },
