@@ -13,6 +13,8 @@ export const view = signal<View>(window.innerWidth < 760 ? 'list' : 'grid')
 export const groupBy = signal<GroupBy>('type')
 export const query = signal<string>('')
 export const interests = signal<string[]>([])
+/** Co-located events (Monday) to narrow to; empty is all. */
+export const colos = signal<string[]>([])
 export const hidden = signal<SessionType[]>([...DEFAULT_HIDDEN])
 export const favs = signal<string[]>(readLS('kc26.favs', []))
 export const selected = signal<string | null>(null)
@@ -45,12 +47,18 @@ function writeLS(key: string, v: unknown) {
 export const sessionsById = computed(() => new Map((schedule.value?.sessions ?? []).map((s) => [s.id, s])))
 export const searchHits = computed(() => search(query.value))
 
-/** Everything that survives the type and search filters (not interests): what the chips count. */
-export const pool = computed(() => {
+/** Everything that survives the type and search filters: what the co-located event chips count. */
+const pool0 = computed(() => {
   const all = schedule.value?.sessions ?? []
   const hide = new Set(hidden.value)
   const hits = searchHits.value
   return all.filter((s) => !hide.has(s.type) && (!hits || hits.has(s.id)))
+})
+/** …and the co-located event filter on top (not interests): what the interest chips count. */
+export const pool = computed(() => {
+  const want = colos.value
+  if (want.length === 0) return pool0.value
+  return pool0.value.filter((s) => s.colo && want.includes(s.colo))
 })
 
 /** …and the interest filter on top: what the grid and list show. */
@@ -72,6 +80,12 @@ export const interestCounts = computed(() => {
   return out
 })
 
+export const coloCounts = computed(() => {
+  const out: Record<string, number> = {}
+  for (const s of pool0.value) if (s.colo) out[s.colo] = (out[s.colo] ?? 0) + 1
+  return out
+})
+
 export const typeCounts = computed(() => {
   const out: Partial<Record<SessionType, number>> = {}
   for (const s of schedule.value?.sessions ?? []) out[s.type] = (out[s.type] ?? 0) + 1
@@ -88,13 +102,13 @@ export const selectedSession = computed(() => (selected.value ? sessionsById.val
 /** The view actually rendered: the grid is a desktop thing, a phone gets the list instead. */
 export const shownView = computed<View>(() => (narrow.value && view.value === 'grid' ? 'list' : view.value))
 
-/** The active interests, said short: members whose whole preset is on, then the rest by label. */
+/** The active filters, said short: co-located events, members whose whole preset is on, then the rest by label. */
 export const interestSummary = computed(() => {
   const sched = schedule.value
   const want = interests.value
-  if (!sched || want.length === 0) return ''
+  if (!sched || (want.length === 0 && colos.value.length === 0)) return ''
   const covered = new Set<string>()
-  const parts: string[] = []
+  const parts: string[] = [...colos.value]
   for (const m of sched.team) {
     if (m.interests.every((i) => want.includes(i))) {
       parts.push(m.name)
@@ -120,6 +134,17 @@ export function toggleInterest(id: string) {
 }
 export function clearInterests() {
   interests.value = []
+}
+export function toggleColo(name: string) {
+  const cur = colos.value
+  colos.value = cur.includes(name) ? cur.filter((x) => x !== name) : [...cur, name]
+}
+/** Interests and co-located events both off. */
+export function clearFilters() {
+  batch(() => {
+    interests.value = []
+    colos.value = []
+  })
 }
 export function memberState(m: Member): 'on' | 'half' | 'off' {
   const cur = new Set(interests.value)
@@ -199,7 +224,7 @@ export async function copyLink(s?: Session) {
 }
 
 // ---- the URL hash ----------------------------------------------------------------------------
-// #d=2026-11-10&v=grid&g=type&q=words&i=storage,agents&h=break,registration&s=1234
+// #d=2026-11-10&v=grid&g=type&q=words&i=storage,agents&c=ArgoCon,FluxCon&h=break,registration&s=1234
 // Only what differs from the defaults is written. Reading happens once at start; writing, on
 // every change, with replaceState so the back button is not a filter history.
 
@@ -218,6 +243,8 @@ function readHash() {
   const i = h.get('i')
   if (i !== null) interests.value = i ? i.split(',').filter(Boolean) : []
   else interests.value = readLS('kc26.interests', [])
+  const c = h.get('c')
+  colos.value = c ? c.split(',').filter(Boolean) : []
   const hid = h.get('h')
   if (hid !== null) hidden.value = hid ? (hid.split(',') as SessionType[]) : []
   selected.value = h.get('s')
@@ -230,6 +257,7 @@ function writeHash() {
   if (groupBy.value !== 'type') h.set('g', groupBy.value)
   if (query.value.trim()) h.set('q', query.value.trim())
   if (interests.value.length) h.set('i', interests.value.join(','))
+  if (colos.value.length) h.set('c', colos.value.join(','))
   const hk = [...hidden.value].sort().join(',')
   if (hk !== DEFAULT_HIDDEN_KEY) h.set('h', hk)
   if (selected.value) h.set('s', selected.value)

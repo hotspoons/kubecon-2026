@@ -124,9 +124,12 @@ input[type='search']::-webkit-search-cancel-button, input[type='search']::-webki
 .chip.ghost { border-style: dashed; color: var(--fg-2); }
 .chip.off { opacity: 0.5; text-decoration: line-through; }
 .chip.zero:not(.on) { opacity: 0.45; }
+.chip .sw { width: 8px; height: 8px; border-radius: 2px; background: var(--c, var(--fg-3)); flex: none; }
+.chip .x { color: var(--fg-3); font-size: 14px; line-height: 1; margin: -2px -3px -2px 0; }
+.chip.on:hover .x { color: var(--fg); }
 /* phone-only and desktop-only pieces of the toolbar (the media query below flips them) */
-.mob, .filt, .brk { display: none; }
-.filt { align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--fg-1); font-size: 13px; font-weight: 600; white-space: nowrap; flex: none; }
+.mob, .brk { display: none; }
+.filt { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--fg-1); font-size: 13px; font-weight: 600; white-space: nowrap; flex: none; }
 .filt.on { border-color: var(--blue); color: #cfe6ff; background: rgba(59, 155, 255, 0.14); }
 .filt b { font-family: var(--mono); font-size: 11px; color: var(--blue); background: rgba(59, 155, 255, 0.18); border-radius: 999px; padding: 1px 6px; }
 .summary { align-items: center; gap: 4px; width: 100%; min-width: 0; text-align: left; color: var(--fg-2); font-size: 12.5px; padding: 2px 0 0; }
@@ -296,11 +299,25 @@ input[type='search']::-webkit-search-cancel-button, input[type='search']::-webki
 .loading .bar i { display: block; height: 100%; width: 40%; background: linear-gradient(90deg, var(--blue), var(--green)); animation: run 1s infinite linear; }
 @keyframes run { from { transform: translateX(-100%); } to { transform: translateX(350%); } }
 /* ---- the interest picker (phones) ------------------------------------------------------ */
-.sheet { position: fixed; inset: 0; z-index: 45; background: var(--bg); display: flex; flex-direction: column; animation: up 0.18s ease-out; }
+.scrim.pk { z-index: 44; }
+.sheet {
+  position: fixed; inset: 0; margin: auto; z-index: 45;
+  width: min(760px, calc(100vw - 32px)); height: min(86vh, 900px);
+  background: var(--bg); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; overflow: hidden;
+  animation: up 0.18s ease-out;
+}
 @keyframes up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 .sheet .sh { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; border-bottom: 1px solid var(--line-2); background: var(--bg-1); }
 .sheet .sh > div { display: flex; flex-direction: column; gap: 2px; }
+.sheet .sh > div { flex: 1; min-width: 0; }
 .sheet .sh > div > b { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+.sheet .ps { position: relative; padding: 10px 16px 10px; border-bottom: 1px solid var(--line); }
+.sheet .ps input { width: 100%; height: 40px; padding: 0 36px 0 12px; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 10px; color: var(--fg); font-size: 15px; }
+.sheet .ps input::placeholder { color: var(--fg-3); }
+.sheet .ps input:focus { border-color: var(--blue); background: var(--bg-3); outline: none; box-shadow: 0 0 0 3px rgba(59, 155, 255, 0.18); }
+.sheet .ps .clear { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); color: var(--fg-2); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; }
+.sheet .ps .clear:hover { background: var(--bg-3); color: var(--fg); }
 .sheet .sb { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 4px 16px calc(40px + env(safe-area-inset-bottom, 0px)); }
 .sheet h4 { margin: 18px 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-3); font-weight: 700; display: flex; align-items: baseline; gap: 12px; }
 .sheet h4 .lnk { color: var(--blue); text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 600; }
@@ -325,6 +342,8 @@ input[type='search']::-webkit-search-cancel-button, input[type='search']::-webki
 
   /* the toolbar: search + Interests on one row, the days + the view on the next, a summary line */
   .toolbar { padding: 6px 12px 5px; gap: 5px; background: var(--bg); }
+  .sheet { inset: 0; margin: 0; width: auto; height: auto; border: 0; border-radius: 0; box-shadow: none; }
+  .sheet .ps input { font-size: 16px; }
   .toolbar .row { gap: 6px; }
   .search { flex: 1 1 0; min-width: 0; max-width: none; }
   .search input { font-size: 16px; height: 40px; padding-left: 36px; } /* 16px: iOS does not zoom the page on focus */

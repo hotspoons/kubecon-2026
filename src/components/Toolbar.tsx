@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'preact/hooks'
 import { fmtDay } from '../data'
-import { clock, countByDay, day, favs, groupBy, interestSummary, interests, narrow, picker, query, schedule, setQuery, view, filtered } from '../state'
-import { InterestChips, TeamButtons, TypeChips } from './Filters'
+import { clearFilters, clock, colos, countByDay, day, favs, groupBy, interestSummary, interests, narrow, picker, query, schedule, setQuery, view, filtered } from '../state'
+import { ActiveChips, TeamButtons } from './Filters'
 
 export function Toolbar() {
   const sched = schedule.value!
   const counts = countByDay.value
   const q = query.value
   const total = filtered.value.length
-  const nInt = interests.value.length
+  const nInt = interests.value.length + colos.value.length
+  const word = colos.value.length ? 'filter' : 'interest'
   const searching = q.trim().length >= 2
   // the toolbar wraps to two or three rows depending on width; the grid and the list need its
   // height to size their own scroll area, so it is measured and published as --toolbar-h
@@ -81,11 +82,7 @@ export function Toolbar() {
             <kbd>/</kbd>
           )}
         </div>
-        <button class={`filt ${nInt ? 'on' : ''}`} onClick={() => (picker.value = true)} title="Interests, team presets, kinds of session">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M6 12h12M10 19h4" /></svg>
-          Interests
-          {nInt > 0 && <b>{nInt}</b>}
-        </button>
+        <FiltButton n={nInt} cls="mob" />
         <span class="brk" />
         <div class="seg days" role="tablist" aria-label="Day">
           {sched.event.days.map((d) => (
@@ -116,25 +113,35 @@ export function Toolbar() {
         )}
         <span class="count desk">
           <b>{total}</b> {searching ? 'matches' : 'sessions'}
-          {nInt ? ` · ${nInt} interest${nInt > 1 ? 's' : ''}` : ''}
+          {nInt ? ` · ${nInt} ${word}${nInt > 1 ? 's' : ''}` : ''}
         </span>
       </div>
-      <div class="row nowrap desk">
+      <div class="row desk">
         <div class="team">
           <span class="lbl">Team</span>
           <TeamButtons />
         </div>
         <span class="sep" />
-        <InterestChips />
-        <span class="sep" />
-        <span class="lbl tiny muted" style="text-transform:uppercase;letter-spacing:.06em;font-weight:600">Show</span>
-        <TypeChips />
+        <FiltButton n={nInt} cls="desk" />
+        <ActiveChips />
+        {nInt > 1 && <button class="chip ghost" onClick={clearFilters}>clear all</button>}
       </div>
       <button class="summary mob" onClick={() => (picker.value = true)}>
         <b>{total}</b> {searching ? 'matches' : 'sessions'}
-        <span class="what">{nInt ? ` · ${interestSummary.value}` : ' · all interests'}</span>
+        <span class="what">{nInt ? ` · ${interestSummary.value}` : ' · all interests and events'}</span>
         <span class="chev">›</span>
       </button>
     </div>
+  )
+}
+
+/** Opens the interest picker; the badge is how many interests are on. */
+function FiltButton({ n, cls }: { n: number; cls: string }) {
+  return (
+    <button class={`filt ${cls} ${n ? 'on' : ''}`} onClick={() => (picker.value = true)} title="Interests, team presets, kinds of session">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M6 12h12M10 19h4" /></svg>
+      Interests
+      {n > 0 && <b>{n}</b>}
+    </button>
   )
 }

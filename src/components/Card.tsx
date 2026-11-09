@@ -9,7 +9,7 @@ export function Card({ s, wide = false, conflict = false }: { s: Session; wide?:
   const who = s.speakers.slice(0, wide ? 4 : 2)
   const tags = s.interests
   const shown = wide ? tags : tags.slice(0, 3)
-  const label = s.type === 'talk' ? s.tracks[0] : s.type === 'colo' ? (s.colo ? s.tracks[0] : 'sponsor-hosted') : s.format ?? s.subtopics[0]
+  const label = s.type === 'talk' ? s.tracks[0] : s.type === 'colo' ? s.colo ?? 'sponsor-hosted' : s.format ?? s.subtopics[0]
   return (
     <button
       class={`card ${selected.value === s.id ? 'sel' : ''} ${fav ? 'fav' : ''} ${past ? 'past' : ''} ${conflict ? 'conflict' : ''}`}

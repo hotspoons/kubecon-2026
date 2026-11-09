@@ -15,11 +15,16 @@ bad wifi, bright light, 30 seconds between sessions. Judge every change on the i
 Where mobile stands (2026-11-09, iPhone 14 screenshots in `shots/m*.png`, all seven items of
 the 2026-11-08 list done and screenshotted; nothing tried on a real phone yet):
 
-1. **Interest browser.** Under 760px the team/chips row is gone; an **Interests** button beside
-   the search opens a full-screen sheet (`src/components/Picker.tsx`): team presets, every
-   interest with its count, the kinds of session, clear, Done. A summary line under the day tabs
-   (`786 sessions · Matt, Disaggregated P/D ›`) says what is on and opens the sheet. The
-   desktop row and the sheet share `src/components/Filters.tsx`.
+1. **Interest browser.** One dialog for both (`src/components/Picker.tsx`): full screen on a
+   phone, a centred vertically-scrolling modal on a desktop (Rich, 2026-11-09: "not sure I like
+   the giant horizontally scrolling row"). A filter box at the top narrows team, interests,
+   co-located events and kinds of session as you type. Sections: Team presets, every interest with
+   its count, **Co-located events · Monday** (one chip per event, its colour, its count; picking
+   one narrows the schedule to it, `c=` in the hash, `colos` in state.ts), kinds of session.
+   The desktop second row is now Team + Interests button + the active chips (each tap removes
+   it) + clear all; the phone has the Interests button beside the search and a summary line
+   under the day tabs (`29 sessions · ArgoCon ›`). Shared pieces in `src/components/Filters.tsx`.
+   Monday cards show their event's name as the first pill.
 2. **Chrome.** Header 50px; toolbar is search + Interests on one row, days + view on the next,
    the summary line: 27% of the iPhone 14 viewport at the top, then it slides under the header on
    scroll-down and returns on scroll-up (`html.tb-hide`, set from the scroll handler in Toolbar;

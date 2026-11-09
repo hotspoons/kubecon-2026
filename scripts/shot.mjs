@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Screenshot the running app with headless Chromium, so an agent can see what it built.
 //   node scripts/shot.mjs --url http://localhost:5173/#d=2026-11-10 --out shots/tue.png [--width 1440] [--height 900] [--full] [--mobile]
-//     [--click <selector>]... [--type <text>] [--scroll <px>] [--wait <ms>]
+//     [--click <selector>]... [--type <text>] [--fill "<selector>|<text>"] [--scroll <px>] [--wait <ms>]
 // --click, --type and --scroll happen in the order given, after the app is ready: --click clicks the
-// first element the CSS selector matches, --type types into the search box, --scroll scrolls the page
+// first element the CSS selector matches, --type types into the search box, --fill into any input, --scroll scrolls the page
 // (a negative number scrolls back up by that much, after a scroll down, to see the toolbar return).
 import { chromium, devices } from 'playwright'
 import { mkdir } from 'node:fs/promises'
@@ -22,7 +22,7 @@ const full = args.includes('--full')
 const mobile = args.includes('--mobile')
 const steps = []
 for (let i = 0; i < args.length; i++) {
-  if (['--click', '--type', '--scroll', '--wait'].includes(args[i])) steps.push([args[i].slice(2), args[++i]])
+  if (['--click', '--type', '--fill', '--scroll', '--wait'].includes(args[i])) steps.push([args[i].slice(2), args[++i]])
 }
 
 await mkdir(dirname(out), { recursive: true })
@@ -38,6 +38,10 @@ await page.waitForTimeout(300)
 for (const [what, arg] of steps) {
   if (what === 'click') await page.click(arg)
   else if (what === 'type') await page.fill('.search input', arg)
+  else if (what === 'fill') {
+    const [sel, text] = arg.split('|')
+    await page.fill(sel, text)
+  }
   else if (what === 'scroll') {
     const n = Number(arg)
     // in steps, so the scroll-direction logic sees it like a thumb would
