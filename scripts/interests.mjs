@@ -282,6 +282,19 @@ export const INTERESTS = [
     ],
   },
   {
+    id: 'business',
+    label: 'Business & adoption',
+    blurb: 'end-user stories, case studies, adoption, ROI and TCO, licensing, governance, policy, go-to-market',
+    rules: [
+      'case stud(?:y|ies)', 'end[- ]users?', 'user stor(?:y|ies)', 'success stor(?:y|ies)', 'adoption', 'adopt\\w*',
+      'customers?', 'enterprises?', 'business\\w*', 'roi', 'return on investment', 'total cost of ownership', 'tco',
+      'go[- ]to[- ]market', 'licens\\w*', 'procurement', 'vendors?', 'vendor lock-in', 'commercial\\w*', 'monetiz\\w*',
+      'revenue', 'startups?', 'market\\w*', 'regulat\\w*', 'compliance', 'public policy',
+      'governance', 'ospos?', 'open source program', 'leadership', 'executives?', 'stakeholders?', 'buy (?:vs\\.?|versus|or) build',
+      'migration stor\\w*', 'sovereignty', 'digital sovereignty',
+    ],
+  },
+  {
     id: 'wasm',
     label: 'WebAssembly',
     blurb: 'Wasm on Kubernetes: Spin, wasmCloud, components',
@@ -298,6 +311,8 @@ export const TEAM = [
   { id: 'mason', name: 'Mason', about: 'testing things', interests: ['testing'] },
   { id: 'liam', name: 'Liam', about: 'operators, DRA, disaggregated P/D, scheduling', interests: ['operators', 'dra', 'disagg', 'scheduling'] },
   { id: 'rich', name: 'Rich', about: 'agents and agentic stuff', interests: ['agents'] },
+  { id: 'ed', name: 'Ed', about: 'inference, HPC, GPUs and accelerators', interests: ['inference', 'hpc', 'gpu'] },
+  { id: 'ryan', name: 'Ryan', about: 'the business side: adoption, customers, licensing, cost', interests: ['business', 'cost'] },
 ]
 
 /** Where a hit lands, and what it is worth. */

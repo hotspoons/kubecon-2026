@@ -62,6 +62,10 @@ Liam's ask that shaped the interest feature: categorize talks by each team membe
 interests: storage and performance (Matt), testing (Mason), operators / DRA / disaggregated P/D
 (Liam), agents and agentic (Rich). Rich added: align the taxonomy with inference, HPC, storage,
 operators, scheduling, training, disagg P/D; allow a custom mapping per event; fuzzy search.
+2026-11-09: two more presets, Ed (co-founder: inference, HPC, GPUs) and Ryan (marketing: the
+business side), and a 27th interest, `business` ("Business & adoption": end-user stories via
+the Sessionize end-user flag, case studies, adoption, customers, licensing, governance, policy,
+cost is Ryan's other one). Ed 131 talks, Ryan 153.
 
 ## Where things stand
 
@@ -82,10 +86,10 @@ Done and verified:
   (818 sessions, ~2 MiB raw, ~450 KiB compressed). Cached raw feeds in `.cache/sessionize/`.
   The sponsor-hosted feed (`etvmcsmr`) duplicates 14 placeholder blocks in the main feed; skipped.
   The co-located Sched site (colocatedeventsna2026.sched.com) is locked; not used.
-- `scripts/interests.mjs`: 26 interests with keyword rules, scoring (title/label 3, abstract 1,
-  threshold 3), team presets. `data/overrides.json`: per-session hand corrections. `just report`
-  prints the distribution. Last run: Matt 117 talks, Mason 42, Liam 59, Rich 162; 78 untagged
-  talks, mostly logistics (opening remarks, breaks typed as lightning, etc.).
+- `scripts/interests.mjs`: 27 interests with keyword rules, scoring (title/label 3, abstract 1,
+  threshold 3), six team presets. `data/overrides.json`: per-session hand corrections. `just
+  report` prints the distribution. Last run (2026-11-09): Matt 117 talks, Mason 42, Liam 59,
+  Rich 158, Ed 131, Ryan 153; 61 untagged talks, mostly logistics and sponsor-hosted placeholders.
 - The app: Preact + signals + Fuse.js, Vite 8, TypeScript 6. Grid (15-minute rows × columns by
   type / track / room, 5 cards per cell then "+n more"), list view, My schedule with overlap
   detection and .ics export, detail drawer with "why tagged", fuzzy search, interest chips with

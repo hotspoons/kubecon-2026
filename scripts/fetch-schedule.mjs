@@ -217,11 +217,15 @@ export function normalize(feed, { code, kind, page }) {
   return out
 }
 
-/** Tag every session; the labels fed to the rules are its tracks, subtopics, projects and co-located event. */
+/**
+ * Tag every session; the labels fed to the rules are its tracks, subtopics, projects and co-located
+ * event, plus "End user story" when Sessionize flags it as an end-user talk (so the business
+ * interest catches every one of those, whatever the title says).
+ */
 export function tagAll(sessions, overrides) {
   for (const s of sessions) {
     const { tags, why } = tagSession(
-      { id: s.id, title: s.title, abstract: s.abstract, labels: [...s.tracks, ...s.subtopics, ...s.projects, s.colo ?? ''] },
+      { id: s.id, title: s.title, abstract: s.abstract, labels: [...s.tracks, ...s.subtopics, ...s.projects, s.colo ?? '', s.endUser ? 'End user story' : ''] },
       overrides,
     )
     s.interests = tags

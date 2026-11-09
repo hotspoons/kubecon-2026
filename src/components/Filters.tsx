@@ -3,7 +3,7 @@
 import { TYPE_ORDER, type SessionType } from '../data'
 import { clearInterests, hidden, interestCounts, interests, memberState, schedule, toggleInterest, toggleMember, toggleType, typeCounts } from '../state'
 
-export const MEMBER_COLORS: Record<string, string> = { matt: '#6ac8ff', mason: '#ffb84d', liam: '#8b7bff', rich: '#3ddc84' }
+export const MEMBER_COLORS: Record<string, string> = { matt: '#6ac8ff', mason: '#ffb84d', liam: '#8b7bff', rich: '#3ddc84', ed: '#ff6b8b', ryan: '#2fd4d4' }
 
 export function TeamButtons() {
   const sched = schedule.value!
